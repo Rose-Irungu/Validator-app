@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function IdeaForm({ onSubmit, isLoading = false }) {
+export default function IdeaForm({ onSubmit, isLoading = false, error = null }) {
   const [concept, setConcept] = useState("");
   const [market, setMarket] = useState("");
 
@@ -21,7 +21,11 @@ export default function IdeaForm({ onSubmit, isLoading = false }) {
         The more specific you are, the sharper your report will be. This takes
         about <span className="font-bold text-[#004B38]">3 minutes.</span>
       </p>
-
+              {error && (
+          <p role="alert" className="mt-3 rounded-sm bg-red-50 px-3 py-2 text-center text-xs text-red-700">
+            {error}
+          </p>
+        )}
       <form onSubmit={handleSubmit} className="mt-8">
         <label htmlFor="concept" className="block text-sm font-semibold text-black">
           Concept core
