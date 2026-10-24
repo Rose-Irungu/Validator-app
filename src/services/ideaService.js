@@ -13,9 +13,9 @@ export async function validateIdea({ concept, market }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-  concept,
-  targetMarket: market || undefined,
-}),
+        query: concept,
+        region: market || "",
+      }),
       signal: controller.signal,
     });
 
@@ -27,22 +27,30 @@ export async function validateIdea({ concept, market }) {
     }
 
     if (!response.ok) {
+      console.error("Validate API error:", response.status, data);
       const message =
-        typeof data?.error === "string"
-          ? data.error
-          : typeof data?.message === "string"
-          ? data.message
-          : "Something went wrong. Please try again.";
+        response.status >= 500
+          ? "Our analysis service is having trouble right now. Please try again in a few minutes."
+          : typeof data?.error === "string"
+            ? data.error
+            : typeof data?.message === "string"
+              ? data.message
+              : "Something went wrong. Please try again.";
       throw new Error(message);
     }
 
     return data;
-    } catch (err) {
+  } catch (err) {
     if (err.name === "AbortError") {
-      throw new Error("The analysis is taking too long. Please try again.", { cause: err });
+      throw new Error("The analysis is taking too long. Please try again.", {
+        cause: err,
+      });
     }
     if (err instanceof TypeError) {
-      throw new Error("Could not reach the server. Check your connection and try again.", { cause: err });
+      throw new Error(
+        "Could not reach the server. Check your connection and try again.",
+        { cause: err },
+      );
     }
     throw err;
   } finally {
